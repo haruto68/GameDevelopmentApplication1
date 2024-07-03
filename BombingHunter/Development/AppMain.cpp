@@ -29,7 +29,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{
 		//シーンの初期化
 		scene->Initialize();
-
+		
 		//メインループ(ウィンドウの異常発生 or ESCキーが押されたら、ループ終了)
 		while (ProcessMessage() != -1 && CheckHitKey(KEY_INPUT_ESCAPE) != TRUE)
 		{

@@ -4,6 +4,7 @@
 //コンストラクタ
 Enemy4::Enemy4() :
 	animation_count(0),
+	animation_count2(0),
 	box_size(0.0)
 {
 	animation[0] = NULL;
@@ -25,8 +26,8 @@ void Enemy4::Initialize()
 	object_type = ENEMY4;
 
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/images/テキ/ハーピー1.png");
-	animation[1] = LoadGraph("Resource/images/テキ/ハーピー2.png");
+	animation[0] = LoadGraph("Resource/images/Enemy/Harpy/1.png");
+	animation[1] = LoadGraph("Resource/images/Enemy/Harpy/2.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
@@ -48,16 +49,29 @@ void Enemy4::Initialize()
 void Enemy4::Update()
 {
 	//移動処理
-	Movement();
+	if (anime_flag == FALSE)
+	{
+		Movement();
+	}
 	//アニメーション制御
 	AnimationControl();
+	
 }
 
 //描画処理
 void Enemy4::Draw() const
 {
 	//ハネテキ画像の描画
-	DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	if (anime_flag)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, alpha);
+	}
+	else
+	{
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	}
 
 	//デバッグ用
 #if _DEBUG
@@ -80,9 +94,14 @@ void Enemy4::Finalize()
 //当たり判定通知処理
 bool Enemy4::OnHitCollision(GameObject* hit_object)
 {
-	//当たった時の処理
 	bool value = FALSE;
+
 	int type = hit_object->GetObjectType();
+
+	if (type == BULLETS_P && anime_flag == FALSE)
+	{
+		hit_object->SetAnimeFlag(TRUE);
+	}
 
 	return value;
 }
@@ -111,23 +130,42 @@ void Enemy4::Movement()
 //アニメーション制御
 void Enemy4::AnimationControl()
 {
-	//フレームカウントを加算する
-	animation_count++;
-
-	//60フレーム目に到達したら
-	if (animation_count >= 60)
+	if (anime_flag == FALSE)
 	{
-		//カウントのリセット
-		animation_count = 0;
+		//フレームカウントを加算する
+		animation_count++;
 
-		//画像の切り替え
-		if (image == animation[0])
+		//60フレーム目に到達したら
+		if (animation_count >= 60)
 		{
-			image = animation[1];
+			//カウントのリセット
+			animation_count = 0;
+
+			//画像の切り替え
+			if (image == animation[0])
+			{
+				image = animation[1];
+			}
+			else
+			{
+				image = animation[0];
+			}
 		}
-		else
+	}
+	else
+	{
+		//フレームカウントを加算する
+		animation_count2++;
+		alpha -= 4;
+
+		//60フレーム目に到達したら
+		if (animation_count2 < 60)
 		{
-			image = animation[0];
+			location.y += 0.3f;
+		}
+		if (alpha <= 0)
+		{
+			DiscardObject(this);
 		}
 	}
 }

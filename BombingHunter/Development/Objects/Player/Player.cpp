@@ -26,8 +26,8 @@ void Player::Initialize()
 	object_type = PLAYER;
 
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/トリパイロット/飛ぶ1.png");
-	animation[1] = LoadGraph("Resource/Images/トリパイロット/飛ぶ2.png");
+	animation[0] = LoadGraph("Resource/Images/Player/1.png");
+	animation[1] = LoadGraph("Resource/Images/Player/2.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
@@ -39,7 +39,7 @@ void Player::Initialize()
 	radian = 0.0;
 
 	//大きさの設定
-	box_size = 64.0;
+	box_size = 50.0;
 
 	//初期画像の設定
 	image = animation[0];
@@ -52,8 +52,6 @@ void Player::Update()
 	Movement();
 	//アニメーション制御
 	AnimationControl();
-
-	
 }
 
 //描画処理
@@ -83,8 +81,20 @@ void Player::Finalize()
 //当たり判定通知処理
 bool Player::OnHitCollision(GameObject* hit_object)
 {
-	//当たった時の処理
-	return FALSE;
+	bool value = FALSE;
+
+	int type = hit_object->GetObjectType();
+
+	switch (type)
+	{
+	case BULLETS_E:
+		hit_object->SetAnimeFlag(TRUE);
+		break;
+	default:
+		break;
+	}
+
+	return value;
 }
 
 //移動処理

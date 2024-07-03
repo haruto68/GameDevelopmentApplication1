@@ -1,13 +1,14 @@
 #pragma once
 
-#include"../GameObject.h"
+#include"../Object.h"
 
 //クラス定義
-class Enemy1 : public GameObject
+class Enemy1 : public Object
 {
 private:
 	int animation[2];			//アニメーション画像
 	int animation_count;		//アニメーション時間
+	int animation_count2;		//アニメーション時間2
 	float box_size;				//当たり判定
 	float speed;				//スピード
 

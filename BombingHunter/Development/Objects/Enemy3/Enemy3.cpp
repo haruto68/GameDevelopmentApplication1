@@ -4,6 +4,7 @@
 //コンストラクタ
 Enemy3::Enemy3() :
 	animation_count(0),
+	animation_count2(0),
 	box_size(0.0)
 {
 	animation[0] = NULL;
@@ -28,11 +29,11 @@ void Enemy3::Initialize()
 	object_type = ENEMY3;
 
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/images/テキ/金のテキ1.png");
-	animation[1] = LoadGraph("Resource/images/テキ/金のテキ2.png");
-	animation[2] = LoadGraph("Resource/images/テキ/金のテキ3.png");
-	animation[3] = LoadGraph("Resource/images/テキ/金のテキ4.png");
-	animation[4] = LoadGraph("Resource/images/テキ/金のテキ5.png");
+	animation[0] = LoadGraph("Resource/images/Enemy/gold/1.png");
+	animation[1] = LoadGraph("Resource/images/Enemy/gold/2.png");
+	animation[2] = LoadGraph("Resource/images/Enemy/gold/3.png");
+	animation[3] = LoadGraph("Resource/images/Enemy/gold/4.png");
+	animation[4] = LoadGraph("Resource/images/Enemy/gold/5.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1 || animation[2] == -1 || animation[3] == -1 || animation[4] == -1)
@@ -54,16 +55,29 @@ void Enemy3::Initialize()
 void Enemy3::Update()
 {
 	//移動処理
-	Movement();
+	if (anime_flag == FALSE)
+	{
+		Movement();
+	}
 	//アニメーション制御
 	AnimationControl();
+	
 }
 
 //描画処理
 void Enemy3::Draw() const
 {
 	//ハネテキ画像の描画
-	DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	if (anime_flag)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, alpha);
+	}
+	else
+	{
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	}
 
 	//デバッグ用
 #if _DEBUG
@@ -89,9 +103,14 @@ void Enemy3::Finalize()
 //当たり判定通知処理
 bool Enemy3::OnHitCollision(GameObject* hit_object)
 {
-	//当たった時の処理
 	bool value = FALSE;
+
 	int type = hit_object->GetObjectType();
+
+	if (type == BULLETS_P && anime_flag == FALSE)
+	{
+		hit_object->SetAnimeFlag(TRUE);
+	}
 
 	return value;
 }
@@ -120,35 +139,54 @@ void Enemy3::Movement()
 //アニメーション制御
 void Enemy3::AnimationControl()
 {
-	//フレームカウントを加算する
-	animation_count++;
-
-	//60フレーム目に到達したら
-	if (animation_count >= 12)
+	if (anime_flag == FALSE)
 	{
-		//カウントのリセット
-		animation_count = 0;
+		//フレームカウントを加算する
+		animation_count++;
 
-		//画像の切り替え
-		if (image == animation[0])
+		//12フレーム目に到達したら
+		if (animation_count >= 12)
 		{
-			image = animation[1];
+			//カウントのリセット
+			animation_count = 0;
+
+			//画像の切り替え
+			if (image == animation[0])
+			{
+				image = animation[1];
+			}
+			else if (image == animation[1])
+			{
+				image = animation[2];
+			}
+			else if (image == animation[2])
+			{
+				image = animation[3];
+			}
+			else if (image == animation[3])
+			{
+				image = animation[4];
+			}
+			else if (image == animation[4])
+			{
+				image = animation[0];
+			}
 		}
-		else if(image == animation[1])
+	}
+	else
+	{
+		//フレームカウントを加算する
+		animation_count2++;
+		alpha -= 4;
+
+		//60フレーム目に到達したら
+		if (animation_count2 < 60)
 		{
-			image = animation[2];
+			location.y += 0.3f;
 		}
-		else if (image == animation[2])
+		if (alpha <= 0)
 		{
-			image = animation[3];
-		}
-		else if (image == animation[3])
-		{
-			image = animation[4];
-		}
-		else if (image == animation[4])
-		{
-			image = animation[0];
+			DiscardObject(this);
 		}
 	}
 }

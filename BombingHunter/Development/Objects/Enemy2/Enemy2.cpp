@@ -1,9 +1,12 @@
 #include"Enemy2.h"
 #include"DxLib.h"
 
+#include"../../Utility/InputControl.h"
+
 //コンストラクタ
 Enemy2::Enemy2() :
 	animation_count(0),
+	animation_count2(0),
 	box_size(0.0)
 {
 	animation[0] = NULL;
@@ -25,8 +28,8 @@ void Enemy2::Initialize()
 	object_type = ENEMY2;
 
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/images/テキ/ハコテキ1.png");
-	animation[1] = LoadGraph("Resource/images/テキ/ハコテキ2.png");
+	animation[0] = LoadGraph("Resource/images/Enemy/box/1.png");
+	animation[1] = LoadGraph("Resource/images/Enemy/box/2.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
@@ -48,16 +51,35 @@ void Enemy2::Initialize()
 void Enemy2::Update()
 {
 	//移動処理
-	Movement();
+	if (anime_flag == FALSE)
+	{
+		Movement();
+	}
 	//アニメーション制御
 	AnimationControl();
+
+	//テキ弾発射
+	int random = GetRand(700);
+	if (random == 0)
+	{
+		GenerateObject(Vector2D(location));
+	}
 }
 
 //描画処理
 void Enemy2::Draw() const
 {
 	//ハネテキ画像の描画
-	DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	if (anime_flag)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, alpha);
+	}
+	else
+	{
+		DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian, image, TRUE, flip_flag);
+	}
 
 	//デバッグ用
 #if _DEBUG
@@ -80,9 +102,14 @@ void Enemy2::Finalize()
 //当たり判定通知処理
 bool Enemy2::OnHitCollision(GameObject* hit_object)
 {
-	//当たった時の処理
 	bool value = FALSE;
+
 	int type = hit_object->GetObjectType();
+
+	if (type == BULLETS_P && anime_flag == FALSE)
+	{
+		hit_object->SetAnimeFlag(TRUE);
+	}
 
 	return value;
 }
@@ -111,23 +138,42 @@ void Enemy2::Movement()
 //アニメーション制御
 void Enemy2::AnimationControl()
 {
-	//フレームカウントを加算する
-	animation_count++;
-
-	//60フレーム目に到達したら
-	if (animation_count >= 60)
+	if (anime_flag == FALSE)
 	{
-		//カウントのリセット
-		animation_count = 0;
+		//フレームカウントを加算する
+		animation_count++;
 
-		//画像の切り替え
-		if (image == animation[0])
+		//60フレーム目に到達したら
+		if (animation_count >= 60)
 		{
-			image = animation[1];
+			//カウントのリセット
+			animation_count = 0;
+
+			//画像の切り替え
+			if (image == animation[0])
+			{
+				image = animation[1];
+			}
+			else
+			{
+				image = animation[0];
+			}
 		}
-		else
+	}
+	else
+	{
+		//フレームカウントを加算する
+		animation_count2++;
+		alpha -= 4;
+
+		//60フレーム目に到達したら
+		if (animation_count2 < 60)
 		{
-			image = animation[0];
+			location.y += 0.3f;
+		}
+		if (alpha <= 0)
+		{
+			DiscardObject(this);
 		}
 	}
 }

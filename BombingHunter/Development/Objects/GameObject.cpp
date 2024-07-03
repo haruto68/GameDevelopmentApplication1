@@ -1,4 +1,5 @@
 #include"GameObject.h"
+#include"../Scene/Scene.h"
 #include"DxLib.h"
 
 //コンストラクタ
@@ -9,9 +10,13 @@ GameObject::GameObject() :
 	image(0),
 	sound(0),
 	flip_flag(FALSE),
-	object_type(0)
+	anime_flag(FALSE),
+	delete_flag(FALSE),
+	alpha(255),
+	object_type(0),
+	MyScene(nullptr)
 {
-
+	
 }
 
 //デストラクタ
@@ -75,8 +80,26 @@ void GameObject::SetLocation(const Vector2D& location)
 	this->location = location;
 }
 
-//反転情報変更勝利
+//反転フラグ変更勝利
 void GameObject::SetFlipFlag(bool flip)
 {
 	this->flip_flag = flip;
+}
+
+//アニメフラグ変更処理
+void GameObject::SetAnimeFlag(bool anime)
+{
+	this->anime_flag = anime;
+}
+
+//削除フラグ変更処理
+void GameObject::SetDeleteFlag(bool del)
+{
+	this->delete_flag = del;
+}
+
+//シーン情報設定処理
+void GameObject::SetMyScene(Scene* scene)
+{
+	this->MyScene = scene;
 }

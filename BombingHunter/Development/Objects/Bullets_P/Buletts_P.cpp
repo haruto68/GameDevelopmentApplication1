@@ -10,14 +10,14 @@
 //コンストラクタ
 Bullets_P::Bullets_P() :
 	animation(),
-	speed(1.0)
+	animation_count(0),
+	speed(0.0),
+	velocity(0.0)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
 	animation[2] = NULL;
 	animation[3] = NULL;
-
-	velocity = 0.0;
 }
 
 //デストラクタ
@@ -33,10 +33,10 @@ void Bullets_P::Initialize()
 	object_type = BULLETS_P;
 
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/トリ弾/爆弾.png");
-	animation[1] = LoadGraph("Resource/Images/トリ弾/爆風1.png");
-	animation[2] = LoadGraph("Resource/Images/トリ弾/爆風2.png");
-	animation[3] = LoadGraph("Resource/Images/トリ弾/爆風3.png");
+	animation[0] = LoadGraph("Resource/Images/Bullets/Player/0.png");
+	animation[1] = LoadGraph("Resource/Images/Bullets/Player/1.png");
+	animation[2] = LoadGraph("Resource/Images/Bullets/Player/2.png");
+	animation[3] = LoadGraph("Resource/Images/Bullets/Player/3.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1 || animation[2] == -1 || animation[3] == -1)
@@ -52,6 +52,9 @@ void Bullets_P::Initialize()
 
 	//初期画像の設定
 	image = animation[0];
+
+	//スピードの設定
+	speed = 1.0;
 
 	//弾に(疑似的に)慣性をつける
 	if ((InputControl::GetKey(KEY_INPUT_LEFT) || InputControl::GetKey(KEY_INPUT_A)) == FALSE &&	//左入力がない
@@ -75,16 +78,28 @@ void Bullets_P::Initialize()
 void Bullets_P::Update()
 {
 	//移動処理
-	Movement();
-	//描画処理
-	Draw();
+	if(anime_flag ==  FALSE)
+	{
+		Movement();
+	}
+	//アニメーション制御
+	if (anime_flag == TRUE)
+	{
+		AnimationControl();
+	}
+	//地面着地
+	if (location.y >= 420)
+	{
+		anime_flag = TRUE;
+	}
+
 }
 
 //描画処理
 void Bullets_P::Draw()const
 {
 	//トリ弾画像の描画
-	DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian + (-velocity.x / π), image, TRUE, FALSE);
+	DrawRotaGraphF(location.x, location.y, OBJECTSIZE, radian + (-velocity.x / 2), image, TRUE, FALSE);
 
 	//デバッグ用
 #if _DEBUG
@@ -109,13 +124,21 @@ void Bullets_P::Finalize()
 //当たり判定通知処理
 bool Bullets_P::OnHitCollision(GameObject* hit_object)
 {
-	//当たった時の処理
 	bool value = FALSE;
+
 	int type = hit_object->GetObjectType();
 
-	if (type == ENEMY1)
+	switch (type)
 	{
-		value = TRUE;
+	case PLAYER:
+		break;
+	case BULLETS_P:
+		break;
+	case BULLETS_E:
+		break;
+	default:
+		hit_object->SetAnimeFlag(TRUE);
+		break;
 	}
 
 	return value;
@@ -163,5 +186,36 @@ void Bullets_P::Movement()
 //アニメーション制御
 void Bullets_P::AnimationControl()
 {
+	//フレームカウントを加算する
+	animation_count++;
 
+	//12フレーム目に到達したら
+	if (animation_count >= 12)
+	{
+		if (delete_flag == TRUE)
+		{
+			DiscardObject(this);
+		}
+
+		//カウントのリセット
+		animation_count = 0;
+
+		//画像の切り替え
+		if (image == animation[0])
+		{
+			image = animation[1];
+			box_size = 30.0f;
+			location.x = location.x - (velocity.x * 10);
+			location.y = location.y - (velocity.y * 10);
+		}
+		else if (image == animation[1])
+		{
+			image = animation[2];
+		}
+		else if (image == animation[2])
+		{
+			image = animation[3];
+			delete_flag = TRUE;
+		}
+	}
 }

@@ -6,19 +6,27 @@
 class Object : public GameObject
 {
 protected:
-	class Scene* myscene;
-
 	template<class OBJECT>
-	OBJECT* CreateObjectP(const Vector2D& location, bool flip)
+	OBJECT* CreateObject(const Vector2D& location, bool flip)
 	{
-
+		this->MyScene->CreateObject<OBJECT>(location, flip);
 	}
 
-public:
-	void SetMyScene(class Scene* scene)
+	//ƒeƒL’e—p
+	void GenerateObject(Vector2D generate)
 	{
-		myscene = scene;
+		this->MyScene->InsertFactory(generate);
 	}
-
 	
+	//”jŠü
+	void DiscardObject(GameObject* discard)
+	{
+		this->MyScene->InsertTrash(discard);
+	}
+
+	//Šl“¾ƒXƒRƒA
+	void Score(int value)
+	{
+		this->MyScene->GetScore(value / 2);
+	}
 };

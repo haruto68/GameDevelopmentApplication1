@@ -1,12 +1,13 @@
 #pragma once
 
-#include"../GameObject.h"
+#include"../Object.h"
 
 //クラス定義
-class Bullets_P : public GameObject
+class Bullets_P : public Object
 {
 private:
 	int animation[4];	//アニメーション画像
+	int animation_count;//アニメーションカウント
 	float speed;		//スピード
 	Vector2D velocity;	//加速度
 
