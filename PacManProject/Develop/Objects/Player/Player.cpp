@@ -5,6 +5,7 @@
 #include "../Food/Food.h"
 
 #define D_PLAYER_SPEED	(50.0f)
+#define SPEED			(1.0f)
 
 Player::Player() :
 	move_animation(),
@@ -20,7 +21,7 @@ Player::Player() :
 	is_power_up(false),
 	is_destroy(false)
 {
-
+	SetPlayerScene(this);
 }
 
 Player::~Player()
@@ -93,6 +94,21 @@ void Player::Draw(const Vector2D& screen_offset) const
 {
 	// 親クラスの描画処理を呼び出す
 	__super::Draw(screen_offset);
+
+	DrawFormatString(35, 10, 0xffffff, "x: %.1f\ny: %.1f", location.x, location.y);
+
+	//DrawFormatString(35, 50, 0xffffff, "   %d", now_direction_state);
+
+	if (is_power_up)
+	{
+		DrawFormatString(35, 50, 0xffffff, "power_up");
+	}
+	else
+	{
+		DrawFormatString(35, 50, 0xffffff, "no_power");
+	}
+
+	//DrawFormatString(5, 10, 0xffffff, "%.f\n%.f", ((location.x/* - 12.0*/) / 24.0) + 1, ((location.y/* - 12.0*/) / 24.0) + 1);
 }
 
 void Player::Finalize()
@@ -144,7 +160,7 @@ void Player::OnHitCollision(GameObjectBase* hit_object)
 	}
 
 	// 当たったオブジェクトが敵だったら
-	if(hit_object->GetCollision().object_type == eObjectType::enemy)
+	if(hit_object->GetCollision().object_type == eObjectType::enemy && is_power_up == false)
 	{
 		player_state = ePlayerState::DIE;
 	}
@@ -256,7 +272,8 @@ void Player::Movement(float delta_second)
 	ePanelID panel = StageData::GetPanelData(location);
 
 	// 入力から移動方向を設定
-	if(input->GetKeyDown(KEY_INPUT_UP) || input->GetButtonDown(XINPUT_BUTTON_DPAD_UP))
+	if(input->GetKeyDown(KEY_INPUT_UP) || input->GetKeyDown(KEY_INPUT_W) ||
+	   input->GetButtonDown(XINPUT_BUTTON_DPAD_UP))
 	{
 		switch(now_direction_state)
 		{
@@ -271,7 +288,8 @@ void Player::Movement(float delta_second)
 				next_direction_state = eDirectionState::UP;
 		}	
 	}
-	else if(input->GetKeyDown(KEY_INPUT_DOWN) || input->GetButtonDown(XINPUT_BUTTON_DPAD_DOWN))
+	else if(input->GetKeyDown(KEY_INPUT_DOWN) || input->GetKeyDown(KEY_INPUT_S) ||
+			input->GetButtonDown(XINPUT_BUTTON_DPAD_DOWN))
 	{
 		switch(now_direction_state)
 		{
@@ -286,7 +304,8 @@ void Player::Movement(float delta_second)
 				next_direction_state = eDirectionState::DOWN;
 		}
 	}
-	else if(input->GetKeyDown(KEY_INPUT_LEFT) || input->GetButtonDown(XINPUT_BUTTON_DPAD_LEFT))
+	else if(input->GetKeyDown(KEY_INPUT_LEFT) || input->GetKeyDown(KEY_INPUT_A) ||
+			input->GetButtonDown(XINPUT_BUTTON_DPAD_LEFT))
 	{
 		switch(now_direction_state)
 		{
@@ -301,7 +320,8 @@ void Player::Movement(float delta_second)
 				next_direction_state = eDirectionState::LEFT;
 		}
 	}
-	else if(input->GetKeyDown(KEY_INPUT_RIGHT) || input->GetButtonDown(XINPUT_BUTTON_DPAD_RIGHT))
+	else if(input->GetKeyDown(KEY_INPUT_RIGHT) || input->GetKeyDown(KEY_INPUT_D) ||
+			input->GetButtonDown(XINPUT_BUTTON_DPAD_RIGHT))
 	{
 		switch(now_direction_state)
 		{
@@ -321,16 +341,16 @@ void Player::Movement(float delta_second)
 	switch(now_direction_state)
 	{
 		case Player::UP:
-			velocity.y = -1.0f;
+			velocity.y = -SPEED;
 			break;
 		case Player::DOWN:
-			velocity.y = 1.0f;
+			velocity.y = SPEED;
 			break;
 		case Player::LEFT:
-			velocity.x = -1.0f;
+			velocity.x = -SPEED;
 			break;
 		case Player::RIGHT:
-			velocity.x = 1.0f;
+			velocity.x = SPEED;
 			break;
 		default:
 			velocity = 0.0f;

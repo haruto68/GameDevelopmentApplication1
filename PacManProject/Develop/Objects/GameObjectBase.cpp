@@ -7,7 +7,8 @@ GameObjectBase::GameObjectBase() :
 	location(0.0f),
 	image(NULL),
 	z_layer(0),
-	mobility(eMobilityType::Stationary)
+	mobility(eMobilityType::Stationary),
+	player_scene(nullptr)
 {
 
 }
@@ -77,7 +78,7 @@ void GameObjectBase::SetOwnerScene(SceneBase* scene)
 /// <returns>位置座標情報</returns>
 const Vector2D& GameObjectBase::GetLocation() const
 {
-	return location;
+	return location;	
 }
 
 /// <summary>
@@ -114,4 +115,10 @@ const int GameObjectBase::GetZLayer() const
 const eMobilityType GameObjectBase::GetMobility() const
 {
 	return mobility;
+}
+
+
+void GameObjectBase::SetPlayerScene(class Player* scene)
+{
+	this->player_scene = scene;
 }

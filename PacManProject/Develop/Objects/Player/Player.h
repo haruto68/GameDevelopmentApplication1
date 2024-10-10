@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "../GameObject.h"
-#include "../../Utility/StageData.h"
+//#include "../../Utility/StageData.h"
 
 // プレイヤー状態
 enum ePlayerState
@@ -89,6 +89,14 @@ public:
 	/// </summary>
 	/// <returns>プレイヤーの状態</returns>
 	bool GetDestroy() const;
+
+
+
+
+	Player* GetInstance()
+	{
+		return this;
+	}
 
 
 private:

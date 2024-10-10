@@ -79,7 +79,7 @@ void Enemy4::Draw() const
 	Vector2D ul = location - (Vector2D(1.0f) * (float)box_size / 2.0f);
 	Vector2D br = location + (Vector2D(1.0f) * (float)box_size / 2.0f);
 
-	DrawBoxAA(ul.x, ul.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
+	//DrawBoxAA(ul.x, ul.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
 #endif
 }
 

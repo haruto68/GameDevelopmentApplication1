@@ -2,6 +2,7 @@
 
 #include "GameObjectBase.h"
 #include "../Scenes/SceneBase.h"
+#include"../Utility/StageData.h"
 
 // ゲームオブジェクトクラス
 class GameObject : public GameObjectBase

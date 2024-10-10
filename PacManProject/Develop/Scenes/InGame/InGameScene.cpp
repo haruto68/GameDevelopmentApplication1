@@ -1,5 +1,11 @@
 ﻿#include "InGameScene.h"
 #include "../../Objects/Player/Player.h"
+//
+#include"../../Objects/Enemy/Akabei/Akabei.h"
+#include"../../Objects/Enemy/Aosuke/Aosuke.h"
+#include"../../Objects/Enemy/Guzuta/Guzuta.h"
+#include"../../Objects/Enemy/Pinky/Pinky.h"
+//
 #include "../../Objects/Enemy/EnemyBase.h"
 #include "../../Objects/Wall/Wall.h"
 #include "../../Objects/Food/Food.h"
@@ -11,6 +17,7 @@
 
 InGameScene::InGameScene() 
 	: player(nullptr)
+	, enemy{}
 	, back_ground_image(NULL)
 	, back_ground_sound(NULL)
 	, pause_flag(false)
@@ -67,6 +74,23 @@ eSceneType InGameScene::Update(const float& delta_second)
 			return eSceneType::re_start;
 		}
 	}
+
+	//プレイヤー座標設定処理
+	enemy[0]->SetPlayerLocation(player->GetLocation());
+
+
+	//いじけ状態取得処理
+	if (enemy[0]->GetPowerDownFlag())
+	{
+		player->SetPowerDown();
+	}
+
+	//いじけ状態設定処理
+	if (player->GetPowerUp() == true && enemy[0]->GetIzike() == false)
+	{
+		enemy[0]->SetIzike();
+	}
+
 
 	// シーン情報を返却する
 	return GetNowSceneType();
@@ -187,13 +211,25 @@ void InGameScene::LoadStageMapCSV()
 			// エネミー
 			case 'E':
 				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
-				CreateObject<EnemyBase>(generate_location);
+				enemy[0] = CreateObject<Akabei>(generate_location);
+				//break;
+			//case 'B':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				//CreateObject<Aosuke>(generate_location);
+				//break;
+			//case 'Y':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				//CreateObject<Guzuta>(generate_location);
+				//break;
+			//case 'P':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				//CreateObject<Pinky>(generate_location);
 				break;
 			// 上記以外
 			default:
 				break;
 		}
-
+		
 	}
 }
 

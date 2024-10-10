@@ -107,7 +107,7 @@ void Bullets_P::Draw()const
 	Vector2D ul = location - (box_size / 2.0f);		//box_collision_upper_left   =  ul  =  ç∂è„
 	Vector2D lr = location + (box_size / 2.0f);		//box_collision_lower_right  =  lr  =  âEâ∫
 
-	DrawBoxAA(ul.x, ul.y, lr.x, lr.y, GetColor(255, 0, 0), FALSE);
+	//DrawBoxAA(ul.x, ul.y, lr.x, lr.y, GetColor(255, 0, 0), FALSE);
 #endif
 }
 

@@ -1,20 +1,16 @@
 ﻿#pragma once
 
 #include "../GameObject.h"
+#include"DxLib.h"
+#include"../../Utility/InputManager.h"
+#include"../Player/Player.h"
+#include"../../Scenes/InGame/InGameScene.h"
 
-//エネミー状態
-enum eEnemyState
-{
-	IDLE,		// 待機状態
-	MOVE,		// 移動状態
-	DIE,		// 死亡状態
-};
+#define	SECONDS	(1200)	//1秒当たりのだいたいのフレーム数
 
 class EnemyBase : public GameObject
 {
 protected:
-
-private:
 	// 進行方向状態
 	enum eDirectionState : unsigned char
 	{
@@ -35,18 +31,36 @@ private:
 		RELEASE,
 	};
 
-private:
-	std::vector<int> move_animation;		// 移動のアニメーション画像
-	std::vector<int> dying_animation;		// 死亡のアニメーション画像
-	Vector2D velocity;						// 移動量
-	eEnemyState enemy_state;				//エネミー状態
+protected:
+	std::vector<int> move_animation;		//移動のアニメーション画像
+	std::vector<int> eye_animation;			//目のアニメーション画像
+	int image[2];							//画像
+
+	Vector2D velocity;						//移動量
 	eBhaviorState behavior_state;			//挙動状態
-	eDirectionState now_direction;			//現在進行方向状態
-	eDirectionState next_direction;			//次回進行方向状態
-	float animation_time;					//アニメーション時間
+	eDirectionState direction;				//進行方向状態
+
+	eDirectionState old_direction;			//過去進行方向状態
+	bool direction_change_flag;				//進行方向変更フラグ
+
+	Vector2D player_location;				//プレイヤー座標
+
+	int point;								//通った分岐点
+	Vector2D branch_points[65];				//分岐点
+	int branch_pattern[65];					//分岐パターン	
+
 	float animation_count;					//アニメーション添字
-	float behaivor_time;					//挙動時間
 	float behaivor_count;					//挙動添字
+	
+	bool is_izike;							//いじけ状態
+	bool old_izike;							//過去いじけ状態
+	int izike_count;						//いじけ添字
+	bool power_down_flag;					//パワーダウンフラグ
+
+	float delta_second_copy;				//Utrunで使う
+
+	bool home;								//巣
+	bool go;								//出
 
 public:
 	EnemyBase();
@@ -63,11 +77,20 @@ public:
 	/// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
 	virtual void OnHitCollision(GameObjectBase* hit_object) override;
 
-	/// <summary>
-	/// エネミーの状態を取得する
-	/// </summary>
-	/// <returns>エネミーの状態</returns>
-	eEnemyState GetEnemyState() const;
+	//プレイヤー座標設定処理
+	void SetPlayerLocation(Vector2D location);
+
+	//挙動状態カウント処理
+	void CountBhavior();
+
+	//いじけ状態設定処理
+	void SetIzike();
+	//いじけ時間カウント処理
+	void CountIzike();
+	//いじけ状態取得処理
+	bool GetIzike();
+	//
+	bool GetPowerDownFlag();
 
 private:
 	/// <summary>
@@ -75,9 +98,25 @@ private:
 	/// </summary>
 	/// <param name="delta_second">1フレームあたりの時間</param>
 	void Movement(float delta_second);
+
 	/// <summary>
 	/// アニメーション制御
 	/// </summary>
 	/// <param name="delta_second">1フレームあたりの時間</param>
 	void AnimationControl(float delta_second);
+
+
+
+	//進行方向決定処理(ランダム)
+	void DecisionDirectionRandom();
+
+public:
+	//進行方向決定処理(逃亡)
+	void DecisionDirectionEscape();
+
+	//進行方向決定処理(巣)
+	void DecisionDirectionHome();
+
+	//Uターン処理
+	void Uturn();
 };

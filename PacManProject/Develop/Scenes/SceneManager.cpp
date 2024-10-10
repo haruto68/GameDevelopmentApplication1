@@ -8,6 +8,8 @@
 #include "InGame/InGameScene.h"
 #include "InGame/ResultScene.h"
 
+#include"../Objects/Enemy/EnemyBase.h"
+
 SceneManager::SceneManager() :
 	current_scene(nullptr)
 {

@@ -25,6 +25,8 @@ protected:
 	int					z_layer;		// レイヤー情報
 	eMobilityType		mobility;		// 可動性
 
+	class Player*		player_scene;
+
 public:
 	GameObjectBase();
 	virtual ~GameObjectBase();
@@ -92,4 +94,6 @@ public:
 	/// <returns>可動性情報</returns>
 	const eMobilityType GetMobility() const;
 
+
+	void SetPlayerScene(class Player* scene);
 };
